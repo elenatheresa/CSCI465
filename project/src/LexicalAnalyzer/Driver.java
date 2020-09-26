@@ -17,7 +17,7 @@ public class Driver {
      * analyzer
      * @param  args get fileName from command line
      */
-    public static void main (String[] args) {
+    public static void main (String[] args) throws Exception {
 
         /**
          * Start of program drives the package

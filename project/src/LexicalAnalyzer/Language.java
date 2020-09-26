@@ -1,7 +1,18 @@
+/**
+ * <h1>Language</h1>
+ * This is the class construction for all possible token
+ * including regular expressions for the package
+ *
+ * @author  Derek Trom
+ * @version 1.0
+ * @since   2020-09-26
+ */
 package LexicalAnalyzer;
 
 public final class Language {
-    //Pascal reserved word token names
+    /**
+     * Pascal reserved word token names
+     */
     public static final String TOK_RW_AND       = "AND";
     public static final String TOK_RW_ARRAY     = "ARRAY";
     public static final String TOK_RW_BEGIN     = "BEGIN";
@@ -24,14 +35,18 @@ public final class Language {
     public static final String TOK_RW_VAR       = "VAR";
     public static final String TOK_RW_WHILE     = "WHILE";
 
-    //Pascal reserved type specifier names
+    /**
+     * Pascal reserved type specifier names
+     */
     public static final String TOK_TS_INT       = "INTTYPE";
     public static final String TOK_TS_REAL      = "REALTYPE";
     public static final String TOK_TS_BOOL      = "BOOLTYPE";
     public static final String TOK_TS_STRING    = "STRTYPE";
     public static final String TOK_TS_CHAR      = "CHARTYPE";
 
-    //Pascal reserved symbol token names
+    /**
+     * Pascal reserved symbol token names
+     */
     public static final String TOK_RS_PLUS       = "PLUS";
     public static final String TOK_RS_MINUS      = "MINUS";
     public static final String TOK_RS_MULT       = "MULT";
@@ -52,7 +67,9 @@ public final class Language {
     public static final String TOK_RS_PERIOD     = "PERIOD";
     public static final String TOK_RS_RANGE      = "RANGE";
 
-    //Pascal language pattern token names
+    /**
+     * Pascal language pattern token names
+     */
     public static final String TOK_LP_ID      = "ID";
     public static final String TOK_LP_NUMBER  = "NUMBER";
     public static final String TOK_LP_STRING  = "STRING";
@@ -65,21 +82,27 @@ public final class Language {
     public static final String TOK_LP_COMMENT = "COMMENT";
     public static final String TOK_LP_ERROR   = "ERROR";
 
-    //Pascal literal datatype token names
+    /**
+     * Pascal literal datatype token names
+     */
     public static final String TOK_LIT_INT  = "INTLIT";
     public static final String TOK_LIT_REAL = "REALLIT";
     public static final String TOK_LIT_BOOL = "BOOLLIT";
     public static final String TOK_LIT_CHAR = "CHRLIT";
     public static final String TOK_LIT_STR  = "STRLIT";
 
-    //Pascal data type names
+    /**
+     * Pascal data type names
+     */
     public static final String TOK_TYPE_INT  = "INTTYPE";
     public static final String TOK_TYPE_REAL = "REALTYPE";
     public static final String TOK_TYPE_BOOL = "BOOLTYPE";
     public static final String TOK_TYPE_CHAR = "CHRTYPE";
     public static final String TOK_TYPE_STR  = "STRTYPE";
 
-    //Pascal regex for language pattern constructions
+    /**
+     * Pascal regex for language pattern constructions
+     */
     public static final String REGEX_LETTER     = "[a-zA-Z]";
     public static final String REGEX_DIGIT      = "[0-9]";
     public static final String REGEX_TRUE       = "true";
@@ -89,7 +112,9 @@ public final class Language {
     public static final String REGEX_ANYTHING   = ".*";
     public static final String REGEX_WHITESPACE = "\\s";
 
-    //Pascal regex for reserved words
+    /**
+     * Pascal regex for reserved words
+     */
     public static final String REGEX_RW_AND       = "and";
     public static final String REGEX_RW_ARRAY     = "array";
     public static final String REGEX_RW_BEGIN     = "begin";
@@ -117,7 +142,9 @@ public final class Language {
     public static final String REGEX_RW_VAR       = "var";
     public static final String REGEX_RW_WHILE     = "while";
 
-    //Pascal regex for reserved symbols
+    /**
+     * Pascal regex for reserved symbols
+     */
     public static final String REGEX_RS_PLUS       = "\\+";
     public static final String REGEX_RS_MINUS      = "-";
     public static final String REGEX_RS_MULT       = "\\*";
@@ -144,21 +171,27 @@ public final class Language {
     public static final String REGEX_RS_DECIMAL    = ".";
     public static final String REGEX_RS_RANGE      = "..";
 
-    //Pascal regex for literal datatypes
+    /**
+     * Pascal regex for literal datatypes
+     */
     public static final String REGEX_LIT_INT    = REGEX_DIGIT + "+";
     public static final String REGEX_LIT_REAL   = REGEX_DIGIT + "+\\." +REGEX_DIGIT+"+";
     public static final String REGEX_LIT_BOOL   = REGEX_TRUE + "|" + REGEX_FALSE;
     public static final String REGEX_LIT_CHAR   = "\'.\'";
     public static final String REGEX_LIT_STRING = REGEX_SINGLEQT + REGEX_ANYTHING + REGEX_SINGLEQT;
 
-    //Pascal regex for complex language patterns
+    /**
+     * Pascal regex for complex language patterns
+     */
     public static final String REGEX_PT_ID          = REGEX_LETTER+"("+REGEX_LETTER+"|"+REGEX_DIGIT+")*";
     public static final String REGEX_PT_CRLYCOMMENT = REGEX_RS_LCRLYBRACK+REGEX_ANYTHING+REGEX_RS_RCRLYBRACK;
     public static final String REGEX_PT_BGRMCOMMENT = REGEX_RS_LBIGRAM+REGEX_ANYTHING+REGEX_RS_RBIGRAM;
     public static final String REGEX_PT_ADDOP       = "["+REGEX_RS_PLUS+REGEX_RS_MINUS+"]";
     public static final String REGEX_PT_RELOP       = "^(^("+REGEX_RS_NE+")?|^("+REGEX_RS_LTE+")?|^("+REGEX_RS_GTE+")?|^("+REGEX_RS_LT+")?|^("+REGEX_RS_GT+")?|^("+REGEX_RS_EQU+")?)?";
 
-    //State values for lexical analysis
+    /**
+     * State values for lexical analysis
+     */
     public static final int ST_START                       = 0;
     public static final int ST_COLON                       = 1;
     public static final int ST_COLON_EQUALS                = 2;
@@ -195,6 +228,8 @@ public final class Language {
     public static final int ST_SINGLEQT_ACCEPTALL          = 33;
     public static final int ST_SINGLEQT_ACCEPTALL_SINGLEQT = 34;
 
-    //An empty constructor for readability
+    /**
+     * empty constructor for reading
+     */
     public Language() {}
 }

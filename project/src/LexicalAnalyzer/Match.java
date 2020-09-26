@@ -1,14 +1,15 @@
+package LexicalAnalyzer;
 /**
- * <h1>Match</h1>
+ * Match
+ *
  * This is the match class and provides a
  * constructor for the matches found.
  *
  * @author  Derek Trom
+ * @author Elena Corpus
  * @version 1.0
  * @since   2020-09-26
  */
-package LexicalAnalyzer;
-
 public class Match {
     private static int totalMatches = 0;
     private int matchID = 0;

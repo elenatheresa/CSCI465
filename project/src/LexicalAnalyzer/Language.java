@@ -1,14 +1,15 @@
+package LexicalAnalyzer;
 /**
- * <h1>Language</h1>
+ * Language
+ *
  * This is the class construction for all possible token
  * including regular expressions for the package
  *
  * @author  Derek Trom
+ * @author Elena Corpus
  * @version 1.0
  * @since   2020-09-26
  */
-package LexicalAnalyzer;
-
 public final class Language {
     /**
      * Pascal reserved word token names

@@ -1,15 +1,16 @@
+package LexicalAnalyzer;
 /**
- * <h1>Lexer</h1>
+ * Lexer
+ *
  * This is the Lexer for the package and provides the getsym
  * module for analyzing the string of tokens and acts
  * as the state machine of the program
  *
  * @author  Derek Trom
+ * @author Elena Corpus
  * @version 1.0
  * @since   2020-09-26
  */
-package LexicalAnalyzer;
-
 public class Lexer {
     private String currentLexeme = "";
     private String currentChar = "";

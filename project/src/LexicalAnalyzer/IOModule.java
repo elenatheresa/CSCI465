@@ -1,19 +1,20 @@
-/**
- * <h1>IOModule</h1>
- * This is the IO module that receives input file
- * as well as receives errors from package
- * classes for the Lexical analyzer package
- *
- * @author  Derek Trom
- * @version 1.0
- * @since   2020-09-26
- */
 package LexicalAnalyzer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+/**
+ * This is the IO module that receives input file
+ * as well as receives errors from package
+ * classes for the Lexical analyzer package
+ *
+ * @author  Derek Trom
+ * @author Elena Corpus
+ * @version 1.0
+ * @since   2020-09-26
+ */
+
 
 public class IOModule {
     /**
@@ -24,6 +25,7 @@ public class IOModule {
     private String programText = "";
     private List<Match> matches = new ArrayList<Match>();
     /**
+     * <p>
      * This method is used to retrieve file and create a buffer
      * to be analyzed
      * @throws Exception error reading the file contents

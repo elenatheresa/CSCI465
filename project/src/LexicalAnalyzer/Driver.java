@@ -1,14 +1,13 @@
+package LexicalAnalyzer;
 /**
- * <h1>Driver</h1>
  * This is the main driver class for the
  * Lexical analyzer package
  *
  * @author  Derek Trom
+ * @author Elena Corpus
  * @version 1.0
  * @since   2020-09-26
  */
-package LexicalAnalyzer;
-
 public class Driver {
     private static String fileName = "";
     /**
@@ -16,6 +15,7 @@ public class Driver {
      * of the package is for the Lexical
      * analyzer
      * @param  args get fileName from command line
+     * @throws Exception no input file provided
      */
     public static void main (String[] args) throws Exception {
 

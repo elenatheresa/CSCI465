@@ -42,54 +42,59 @@ public class Lexer {
      * @throws Exception Thrown if there is an unrecognized token
      */
     public String getsym() throws Exception {
-
-        // reset the stopSearching flag, currentLexeme, and
-        // detectedLexeme to properly search for the next symbol.
+        /**
+         * reset the stopSearching flag, currentLexeme, and
+         * detectedLexeme to properly search for the next symbol.
+         */
         stopSearching = false;
         currentChar = "";
         currentLexeme = "";
         detectedLexeme = "";
 
-        // While we shouldn't stop searching for a match...
+        /**
+         * while we need to search
+         */
         while (!stopSearching) {
-
-            // If programCounter has reached programSize, we should stop
-            // searching because we have run out of symbols in the programText.
+            /**
+             *  If programCounter has reached programSize, we should stop
+             *  searching because we have run out of symbols in the programText.
+             */
             if (programCounter >= programSize) {
                 stopSearching();
                 hasSymbols = false;
                 break;
             }
-
-            // Example of how an exception may be thrown to be handled by the Driver
-            // if (programCounter == 150) {
-            //     throw new Exception("There was an erroneous token discovered on line "+lineCounter);
-            // }
-
-            // If we found a newline, increment the lineCounter
+            /**
+             * if newline
+             */
             if (currentChar.matches(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
-                // System.out.println("Next Line Started");
                 lineCounter++;
                 startLine = lineCounter;
             }
 
-            // System.out.println("CURRENT STATE: "+state);
+            /**
+             * switch for state transitions
+             */
             switch (state) {
-                // --------------------\/-------------------- ST_START --------------------\/-------------------- //
+                /**
+                 * start state
+                 */
                 case LexicalAnalyzer.Language.ST_START :
-                    // Set the lookAheadCounter = to the programCounter so we
-                    // know where to start looking ahead from if necessary.
+                    /**
+                     * Set the lookAheadCounter = to the programCounter so we
+                     * know where to start looking ahead from if necessary.
+                     */
                     lookAheadCounter = programCounter;
-                    // Set the currentChar to the char in the programText
-                    // currently pointed to by the programCounter
+                    /**
+                     * Set the currentChar to the char in the programText
+                     * currently pointed to by the programCounter
+                     */
                     currentChar = Character.toString(programText.charAt(programCounter));
-                    // then, we increment the program counter to look at
-                    // the next character in the programText next time around
+                    /**
+                     * then, we increment the program counter to look at
+                     * the next character in the programText next time around
+                     */
                     programCounter++;
-
-                    // if (currentChar.matches(Language.REGEX_NEWLINE)) {
-                    //     lineCounter++;
-                    // }
 
                     if (currentChar.matches(LexicalAnalyzer.Language.REGEX_RS_COLON)) {
                         state = LexicalAnalyzer.Language.ST_COLON;
@@ -137,10 +142,13 @@ public class Lexer {
                                 "\nFound on line: "+lineCounter);
                     }
                     break;
-                // --------------------/\-------------------- ST_START --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_COLON --------------------\/-------------------- //
+                /**
+                 * state start and colon
+                 */
                 case LexicalAnalyzer.Language.ST_COLON :
-                    // System.out.println("Entering ST_COLON");
+                    /**
+                     * case is colon
+                     */
 
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_COLON;
                     currentLexeme += currentChar;
@@ -148,64 +156,66 @@ public class Lexer {
                     state = LexicalAnalyzer.Language.ST_COLON_EQUALS;
                     break;
 
-                // --------------------/\-------------------- ST_COLON --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_COLON_EQUALS --------------------\/-------------------- //
+                /**
+                 * := case
+                 */
                 case LexicalAnalyzer.Language.ST_COLON_EQUALS :
-                    // System.out.println("Entering ST_COLON_EQUALS");
                     lookAheadCounter++;
-                    // System.out.println("Lookahead counter incremented");
                     currentLexeme += Character.toString(programText.charAt(lookAheadCounter));
-                    // System.out.println(currentLexeme);
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_RS_ASSIGN)) {
                         detectedToken = LexicalAnalyzer.Language.TOK_RS_ASSIGN;
                         detectedLexeme = currentLexeme;
                         lookAheadCounter++;
                         programCounter = lookAheadCounter;
 
-                        // System.out.println("State Reset by ST_COLON_EQUALS - found an ASSIGN");
+                        /**
+                         * reset
+                         */
                         resetStateAndStopSearching();
                         break;
                     } else {
-                        // System.out.println("State Reset by ST_COLON_EQUALS - did not find ASSIGN");
+                        /**
+                         * reset
+                         */
                         resetStateAndStopSearching();
                         break;
                     }
-                    // --------------------/\-------------------- ST_COLON_EQUALS --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_LCRLYBRK --------------------\/-------------------- //
+                    /**
+                     * left curly {
+                     */
                 case LexicalAnalyzer.Language.ST_LCRLYBRK :
-                    // System.out.println("Entering ST_LCRLYBRK");
+
                     detectedToken = LexicalAnalyzer.Language.TOK_LP_COMMENT;
                     currentLexeme += currentChar;
                     detectedLexeme = currentLexeme;
                     lookAheadCounter++;
                     if (Character.toString(programText.charAt(lookAheadCounter)).equals(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
-                        // System.out.println("Next Line Started");
                         lineCounter++;
                         currentLexeme += Character.toString(programText.charAt(lookAheadCounter)).replace("\n","\\n");
                     } else {
                         currentLexeme += Character.toString(programText.charAt(lookAheadCounter));
                     }
-                    // System.out.println("Leaving state ST_LCRLYBRK - found a LCRLYBRACK");
                     state = LexicalAnalyzer.Language.ST_LCRLYBRK_IGNOREALL;
                     break;
-                // --------------------/\-------------------- ST_LCRLYBRK --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LCRLYBRK_IGNOREALL --------------------\/-------------------- //
+                /**
+                 * left curly ignore
+                 */
                 case LexicalAnalyzer.Language.ST_LCRLYBRK_IGNOREALL :
-                    // System.out.println("Entering ST_LCRLYBRK_IGNOREALL");
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_PT_CRLYCOMMENT)) {
                         detectedLexeme = currentLexeme;
                         lookAheadCounter++;
                         programCounter = lookAheadCounter;
-
-                        // System.out.println("State Reset by ST_LCRLYBRK_IGNOREALL - found a COMMENT");
+                        /**
+                         * reset
+                         */
                         resetStateAndStopSearching();
                         break;
                     } else {
                         lookAheadCounter++;
-                        // System.out.println("Lookahead counter incremented");
-                        // System.out.println("No state change - have not yet detected RCRLYBRACK");
+                        /**
+                         * no right curly detected yet
+                         */
                         if (Character.toString(programText.charAt(lookAheadCounter)).equals(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
-                            // System.out.println("Next Line Started");
                             lineCounter++;
                             currentLexeme += Character.toString(programText.charAt(lookAheadCounter)).replace("\n","\\n");
                         } else {
@@ -213,52 +223,52 @@ public class Lexer {
                         }
                         break;
                     }
-                    // --------------------/\-------------------- ST_LCRLYBRK_IGNOREALL --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_LPAREN --------------------\/-------------------- //
+                    /**
+                     * left parentesis
+                     */
                 case LexicalAnalyzer.Language.ST_LPAREN :
-                    // System.out.println("Entering ST_LPAREN");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_LPAREN;
                     currentLexeme += currentChar;
                     detectedLexeme = currentLexeme;
                     state = LexicalAnalyzer.Language.ST_LBIGRAM;
                     break;
-                // --------------------/\-------------------- ST_LPAREN --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LBIGRAM --------------------\/-------------------- //
+                /**
+                 * lparent and left LBIGRAM
+                 */
                 case LexicalAnalyzer.Language.ST_LBIGRAM :
-                    // System.out.println("Entering ST_LBIGRAM");
-                    // System.out.println(currentLexeme);
                     lookAheadCounter++;
-                    // System.out.println("Lookahead counter incremented");
+
                     currentLexeme += Character.toString(programText.charAt(lookAheadCounter));
+
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_RS_LBIGRAM)) {
                         detectedToken = LexicalAnalyzer.Language.TOK_LP_COMMENT;
                         detectedLexeme = currentLexeme;
                         lookAheadCounter++;
                         currentLexeme += Character.toString(programText.charAt(lookAheadCounter));
-                        // System.out.println("Leaving state ST_BIGRAM - found a LBIGRAM");
                         state = LexicalAnalyzer.Language.ST_LBIGRAM_IGNOREALL;
                         break;
                     } else {
-                        // System.out.println("State Reset by ST_LBIGRAM - did not find LBIGRAM");
+                        /**
+                         * reset
+                         */
                         resetStateAndStopSearching();
                         break;
                     }
-                    // --------------------/\-------------------- ST_LBIGRAM --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_LBIGRAM_IGNOREALL --------------------\/-------------------- //
+                    /**
+                     * LBIGRAM_IGNOREALL
+                     */
                 case LexicalAnalyzer.Language.ST_LBIGRAM_IGNOREALL :
-                    // System.out.println("Entering ST_LBIGRAM_IGNOREALL");
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_PT_BGRMCOMMENT)) {
                         detectedLexeme = currentLexeme;
                         lookAheadCounter++;
                         programCounter = lookAheadCounter;
-
-                        // System.out.println("State Reset by ST_LBIGRAM_IGNOREALL - found a COMMENT");
+                        /**
+                         * reset state
+                         */
                         resetStateAndStopSearching();
                         break;
                     } else {
                         lookAheadCounter++;
-                        // System.out.println("Lookahead counter incremented");
-                        // System.out.println("No state change - have not yet detected RBIGRAM");
                         if (Character.toString(programText.charAt(lookAheadCounter)).equals(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
                             // System.out.println("Next Line Started");
                             lineCounter++;
@@ -268,45 +278,45 @@ public class Lexer {
                         }
                         break;
                     }
-                    // --------------------/\-------------------- ST_LBIGRAM_IGNOREALL --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_RPAREN --------------------\/-------------------- //
+                    /**
+                     * hit right parenthesis
+                     */
                 case LexicalAnalyzer.Language.ST_RPAREN :
-                    // System.out.println("Entering ST_RPAREN");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_RPAREN;
                     currentLexeme += currentChar;
                     detectedLexeme = currentLexeme;
-                    // System.out.println("State Reset by ST_RPAREN - found a RPAREN");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_RPAREN --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LETTER --------------------\/-------------------- //
+                /**
+                 * start letter found
+                 */
                 case LexicalAnalyzer.Language.ST_LETTER :
-                    // System.out.println("Entering ST_LETTER");
 
                     currentLexeme += currentChar;
                     detectedLexeme = currentLexeme;
                     state = LexicalAnalyzer.Language.ST_ID;
                     break;
 
-                // --------------------/\-------------------- ST_LETTER --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_ID --------------------\/-------------------- //
+                /**
+                 * id
+                 */
                 case LexicalAnalyzer.Language.ST_ID :
                     detectedToken = LexicalAnalyzer.Language.TOK_LP_ID;
-                    // System.out.println("Entering ST_ID");
                     lookAheadCounter++;
-                    // System.out.println("Lookahead counter incremented");
                     currentLexeme += Character.toString(programText.charAt(lookAheadCounter));
 
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_PT_ID)) {
                         detectedLexeme = currentLexeme;
+                        /**
+                         * Set up a flag to determine whether we found a reserved word.
+                         * For each case, if the detectedLexeme matches any regex of a
+                         * reserved word, we will set the detectedToken to that of the
+                         * reserved word and waive the flag. We will also reset the
+                         * state and stop searching because we have successfully
+                         * determined the symbol, which should be returned to the
+                         * Driver for I/O management by the IOModule.
+                         */
 
-                        // Set up a flag to determine whether we found a reserved word.
-                        // For each case, if the detectedLexeme matches any regex of a
-                        // reserved word, we will set the detectedToken to that of the
-                        // reserved word and waive the flag. We will also reset the
-                        // state and stop searching because we have successfully
-                        // determined the symbol, which should be returned to the
-                        // Driver for I/O management by the IOModule.
                         boolean reservedWordFound = false;
                         switch (detectedLexeme) {
                             case LexicalAnalyzer.Language.REGEX_RW_AND :
@@ -424,12 +434,13 @@ public class Lexer {
                             default:
                                 break;
                         }
+                        /**
+                         * If we found a reserved word, we need to increment the
+                         * lookAheadCounter to point to the next char immediately
+                         * after it and set the programCounter to the lookAheadCounter.
+                         * Else, we don't change the state so we can continue searching
+                         */
 
-                        // If we found a reserved word, we need to increment the
-                        // lookAheadCounter to point to the next char immediately
-                        // after it and set the programCounter to the lookAheadCounter.
-                        // Else, we don't change the state so we can continue searching
-                        // for the entire ID lexeme.
                         String nextChar = Character.toString(programText.charAt(lookAheadCounter+1));
                         String tempID = currentLexeme + nextChar;
 
@@ -444,35 +455,39 @@ public class Lexer {
                         break;
                     } else {
 
-                        // If we didn't match the ID regex, but the next char is a newline,
-                        // we should increment the lineCounter to maintain proper line numbering.
+                        /**
+                         * If we didn't match the ID regex, but the next char is a newline,
+                         * we should increment the lineCounter to maintain proper line numbering.
+                         */
                         if (Character.toString(programText.charAt(lookAheadCounter)).equals(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
                             // System.out.println("Next Line Started");
                             lineCounter++;
                         }
-
-                        // We found an ID, so we should move the programCounter to
-                        // however far lookAheadCounter got successfully, then
-                        // reset the State and stop searching to allow this symbol
-                        // to be returned to the Driver and handled by IOModule.
-                        // System.out.println("State Reset by ST_ID - found an ID");
+                        /**
+                         * found an ID, so we should move the programCounter to
+                         * however far lookAheadCounter got successfully, then
+                         * reset the State and stop searching to allow this symbol
+                         * to be returned to the Driver and handled by IOModule.
+                         * System.out.println("State Reset by ST_ID - found an ID");
+                         */
                         programCounter = lookAheadCounter;
                         resetStateAndStopSearching();
                         break;
                     }
+                    /**
+                     * comma and id
+                     */
 
-                    // --------------------/\-------------------- ST_ID --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_COMMA --------------------\/-------------------- //
                 case LexicalAnalyzer.Language.ST_COMMA :
-                    // System.out.println("Entering ST_COMMA");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_COMMA;
                     currentLexeme += currentChar;
                     detectedLexeme = currentLexeme;
-                    // System.out.println("State Reset by ST_COMMA - found a COMMA");
+                    //reset state
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_COMMA --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_SEMICOLON --------------------\/-------------------- //
+                /**
+                 * comma / semicolon
+                 */
                 case LexicalAnalyzer.Language.ST_SEMICOLON :
                     // System.out.println("Entering ST_SEMICOLON");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_SEMICOLON;
@@ -481,8 +496,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_SEMICOLON - found a SEMICOLON");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_SEMICOLON --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_EQU --------------------\/-------------------- //
+                /**
+                 * semi-colon, equals
+                 */
                 case LexicalAnalyzer.Language.ST_EQU :
                     // System.out.println("Entering ST_EQU");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_EQU;
@@ -491,8 +507,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_EQU - found a EQU");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_EQU --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LT --------------------\/-------------------- //
+                /**
+                 * equals/lessthan
+                 */
                 case LexicalAnalyzer.Language.ST_LT :
                     // System.out.println("Entering ST_LT");
 
@@ -501,8 +518,9 @@ public class Lexer {
                     detectedLexeme = currentLexeme;
                     state = LexicalAnalyzer.Language.ST_LT_EQU;
                     break;
-                // --------------------/\-------------------- ST_LT --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LT_EQU --------------------\/-------------------- //
+                /**
+                 * lessthan equals
+                 */
                 case LexicalAnalyzer.Language.ST_LT_EQU :
                     // System.out.println("Entering ST_LT_EQU");
                     lookAheadCounter++;
@@ -523,8 +541,9 @@ public class Lexer {
                         state = LexicalAnalyzer.Language.ST_NE;
                         break;
                     }
-                    // --------------------/\-------------------- ST_LT_EQU --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_NE --------------------\/-------------------- //
+                    /**
+                     * lt equal ne
+                     */
                 case LexicalAnalyzer.Language.ST_NE :
                     // System.out.println("Entering ST_NE");
 
@@ -542,8 +561,9 @@ public class Lexer {
                         resetStateAndStopSearching();
                     }
                     break;
-                // --------------------/\-------------------- ST_NE --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_GT --------------------\/-------------------- //
+                /**
+                 * not equals greater than
+                 */
                 case LexicalAnalyzer.Language.ST_GT :
                     // System.out.println("Entering ST_GT");
 
@@ -552,8 +572,9 @@ public class Lexer {
                     detectedLexeme = currentLexeme;
                     state = LexicalAnalyzer.Language.ST_GT_EQU;
                     break;
-                // --------------------/\-------------------- ST_GT --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_GT_EQU --------------------\/-------------------- //
+                /**
+                 * greater than equal
+                 */
                 case LexicalAnalyzer.Language.ST_GT_EQU :
                     // System.out.println("Entering ST_GT_EQU");
                     lookAheadCounter++;
@@ -574,10 +595,10 @@ public class Lexer {
                         resetStateAndStopSearching();
                         break;
                     }
-                    // --------------------/\-------------------- ST_GT_EQU --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_DIGIT --------------------\/-------------------- //
+                    /**
+                     * digit
+                     */
                 case LexicalAnalyzer.Language.ST_DIGIT :
-                    // System.out.println("Entering ST_DIGIT");
 
                     detectedToken = LexicalAnalyzer.Language.TOK_LIT_INT;
                     currentLexeme += currentChar;
@@ -585,8 +606,9 @@ public class Lexer {
                     state = LexicalAnalyzer.Language.ST_INTEGER;
                     break;
 
-                // --------------------/\-------------------- ST_DIGIT --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_INTEGER --------------------\/-------------------- //
+                /**
+                 * integer state starts
+                 */
                 case LexicalAnalyzer.Language.ST_INTEGER :
                     // System.out.println("Entering ST_INTEGER");
                     lookAheadCounter++;
@@ -623,8 +645,9 @@ public class Lexer {
                         resetStateAndStopSearching();
                         break;
                     }
-                    // --------------------/\-------------------- ST_INTEGER --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_REAL --------------------\/-------------------- //
+                    /**
+                     * real state
+                     */
                 case LexicalAnalyzer.Language.ST_REAL :
                     // System.out.println("Entering ST_REAL");
                     lookAheadCounter++;
@@ -651,8 +674,9 @@ public class Lexer {
                         resetStateAndStopSearching();
                         break;
                     }
-                    // --------------------/\-------------------- ST_REAL --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_PERIOD --------------------\/-------------------- //
+                    /**
+                     * rperiod
+                     */
                 case LexicalAnalyzer.Language.ST_PERIOD :
                     // System.out.println("Entering ST_PERIOD");
 
@@ -673,9 +697,9 @@ public class Lexer {
                         break;
                     }
                     // System.out.println(currentLexeme);
-
-                    // --------------------/\-------------------- ST_PERIOD --------------------/\-------------------- //
-                    // --------------------\/-------------------- ST_RANGE --------------------\/-------------------- //
+                    /**
+                     * range ..
+                     */
                 case LexicalAnalyzer.Language.ST_RANGE :
                     // System.out.println("Entering ST_RANGE");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_RANGE;
@@ -686,8 +710,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_RANGE - found a RANGE");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_RANGE --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_PLUS --------------------\/-------------------- //
+                /**
+                 *plus
+                 */
                 case LexicalAnalyzer.Language.ST_PLUS :
                     // System.out.println("Entering ST_PLUS");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_PLUS;
@@ -696,8 +721,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_PLUS - found a PLUS");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_PLUS --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_MINUS --------------------\/-------------------- //
+                /**
+                 * minus
+                 */
                 case LexicalAnalyzer.Language.ST_MINUS :
                     // System.out.println("Entering ST_MINUS");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_MINUS;
@@ -706,8 +732,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_MINUS - found a MINUS");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_MINUS --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_MULT --------------------\/-------------------- //
+                /**
+                 * multiply
+                 */
                 case LexicalAnalyzer.Language.ST_MULT :
                     // System.out.println("Entering ST_MULT");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_MULT;
@@ -716,8 +743,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_MULT - found a MULT");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_MULT --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_DIVIDE --------------------\/-------------------- //
+                /**
+                 * divide
+                 */
                 case LexicalAnalyzer.Language.ST_DIVIDE :
                     // System.out.println("Entering ST_DIVIDE");
                     detectedToken = LexicalAnalyzer.Language.TOK_RW_DIV;
@@ -726,8 +754,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_DIVIDE - found a DIVIDE");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_DIVIDE --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_LSQBRACKET --------------------\/-------------------- //
+                /**
+                 * left square bracket
+                 */
                 case LexicalAnalyzer.Language.ST_LSQBRACKET :
                     // System.out.println("Entering ST_LSQBRACKET");
                     detectedToken = LexicalAnalyzer.Language.TOK_RS_LSQBRACKET;
@@ -736,8 +765,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_LSQBRACKET - found a LSQBRACKET");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_LSQBRACKET --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_RSQBRACKET --------------------\/-------------------- //
+                /**
+                 * right square bracket
+                 */
                 case LexicalAnalyzer.Language.ST_RSQBRACKET :
                     // System.out.println("Entering ST_RSQBRACKET");
                     detectedToken = Language.TOK_RS_RSQBRACKET;
@@ -746,8 +776,9 @@ public class Lexer {
                     // System.out.println("State Reset by ST_RSQBRACKET - found a RSQBRACKET");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- ST_RSQBRACKET --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_SINGLEQT --------------------\/-------------------- //
+                /**
+                 * Single quote
+                 */
                 case LexicalAnalyzer.Language.ST_SINGLEQT :
                     // System.out.println("Entering ST_SINGLEQT");
                     detectedToken = LexicalAnalyzer.Language.TOK_LIT_STR;
@@ -764,8 +795,9 @@ public class Lexer {
                     // System.out.println("Leaving state ST_SINGLEQT - found a SINGLEQT");
                     state = LexicalAnalyzer.Language.ST_SINGLEQT_ACCEPTALL;
                     break;
-                // --------------------/\-------------------- ST_SINGLEQT --------------------/\-------------------- //
-                // --------------------\/-------------------- ST_SINGLEQT_ACCEPTALL --------------------\/-------------------- //
+                /**
+                 * single quote accept all
+                 */
                 case LexicalAnalyzer.Language.ST_SINGLEQT_ACCEPTALL :
                     // System.out.println("Entering ST_SINGLEQT_ACCEPTALL");
                     if (currentLexeme.matches(LexicalAnalyzer.Language.REGEX_LIT_STRING)) {
@@ -781,8 +813,6 @@ public class Lexer {
                         break;
                     } else {
                         lookAheadCounter++;
-                        // System.out.println("Lookahead counter incremented");
-                        // System.out.println("No state change - have not yet detected SINGLEQT");
                         if (Character.toString(programText.charAt(lookAheadCounter)).equals(LexicalAnalyzer.Language.REGEX_NEWLINE)) {
                             // System.out.println("Next Line Started");
                             lineCounter++;
@@ -792,47 +822,62 @@ public class Lexer {
                         }
                         break;
                     }
-                    // --------------------/\-------------------- ST_SINGLEQT_ACCEPTALL --------------------/\-------------------- //
-                    // --------------------\/-------------------- DEFAULT --------------------\/-------------------- //
+                    /**
+                     * default case for switch
+                     */
                 default:
                     // System.out.println("State Reset by default case");
                     resetStateAndStopSearching();
                     break;
-                // --------------------/\-------------------- DEFAULT --------------------/\-------------------- //
             }
         }
 
         return detectedLexeme;
     }
 
-    // Returns whether the Lexer is ready to read symbols
+    /**
+     * Determines if the Lexer is ready
+     * @return boolean hasSymbols
+     */
     public boolean isReady() {
         return hasSymbols;
     }
 
-    // Returns the detectedToken
+    /**
+     * Gets and returns the detected token
+     * @return String detectedToken
+     */
     public String getDetectedToken() {
         return detectedToken;
     }
 
-    // Returns the detectedLexeme
+    /**
+     * gets the lexeme
+     * @return String detectedLexeme
+     */
     public String getDetectedLexeme() {
         return detectedLexeme;
     }
 
-    // Used to reset the state and stopSearching
+    /**
+     * Resets the state machine and stops the search
+     */
     public void resetStateAndStopSearching() {
         state = LexicalAnalyzer.Language.ST_START;
         stopSearching();
     }
 
-    // Used to reset the state and restart searching from the first state
+    /**
+     * Used to reset to top of switch state machine
+     */
     public void resetState() {
         System.out.println("STATE RESET from resetState()");
         state = LexicalAnalyzer.Language.ST_START;
     }
 
-    // Used to stop searching for more symbols to add to the detectedLexeme
+    /**
+     * Stops the program from searching
+     */
     public void stopSearching() {
         stopSearching = true;
     }
